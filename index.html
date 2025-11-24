@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haemodialysis Reporting Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Page -->
+        <div id="login-page" class="page active">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="logo">HD</div>
+                        <h1>Haemodialysis Reporting</h1>
+                        <p>Provincial Health Data Management System</p>
+                    </div>
+
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role">Login as</label>
+                            <select id="role" name="role" required>
+                                <option value="hospital">Hospital</option>
+                                <option value="health-service">Health Services</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-full">Login</button>
+                    </form>
+
+                    <div class="demo-credentials">
+                        <p><strong>Demo Credentials:</strong></p>
+                        <p>Hospital: hospital@demo.com / password123</p>
+                        <p>Health Services: healthservice@demo.com / password123</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hospital Dashboard -->
+        <div id="hospital-dashboard" class="page">
+            <div class="dashboard-wrapper">
+                <!-- Sidebar Navigation -->
+                <aside class="sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo-small">HD</div>
+                        <h2>Hospital Portal</h2>
+                    </div>
+                    <nav class="sidebar-nav">
+                        <a href="#" class="nav-item active" data-tab="overview">
+                            <span class="icon">📊</span>
+                            <span>Overview</span>
+                        </a>
+                        <a href="#" class="nav-item" data-tab="input-data">
+                            <span class="icon">✏️</span>
+                            <span>Input Data</span>
+                        </a>
+                        <a href="#" class="nav-item" data-tab="reports">
+                            <span class="icon">📋</span>
+                            <span>Reports</span>
+                        </a>
+                        <a href="#" class="nav-item" data-tab="settings">
+                            <span class="icon">⚙️</span>
+                            <span>Settings</span>
+                        </a>
+                    </nav>
+                    <div class="sidebar-footer">
+                        <div class="user-info">
+                            <div class="user-avatar">U</div>
+                            <div class="user-details">
+                                <p class="user-name">Hospital User</p>
+                                <p class="user-role">Administrator</p>
+                            </div>
+                        </div>
+                        <button class="btn-logout" onclick="logout()">Logout</button>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="main-content">
+                    <header class="top-header">
+                        <h1 id="page-title">Overview</h1>
+                        <div class="header-actions">
+                            <button class="btn-icon" title="Notifications">🔔</button>
+                            <button class="btn-icon" title="Help">❓</button>
+                        </div>
+                    </header>
+
+                    <!-- Overview Tab -->
+                    <div class="tab-content active" id="overview-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Total Cases</p>
+                                    <p class="stat-value" id="total-cases">1,245</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">This Month</p>
+                                    <p class="stat-value" id="month-cases">324</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Active Patients</p>
+                                    <p class="stat-value" id="active-patients">156</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📈</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Average Age</p>
+                                    <p class="stat-value" id="avg-age">54.2</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h3>Cases Trend (Last 6 Months)</h3>
+                                <canvas id="trendsChart" height="100"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>Diagnosis Distribution</h3>
+                                <canvas id="diagnosisChart" height="100"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card full-width">
+                            <h3>Monthly Comparison</h3>
+                            <canvas id="monthlyChart" height="80"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Input Data Tab -->
+                    <div class="tab-content" id="input-data-content">
+                        <div class="form-card">
+                            <h3>Patient Case Registration</h3>
+                            <form id="patient-form" class="patient-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="patient-name">Patient Name *</label>
+                                        <input type="text" id="patient-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="dob">Date of Birth *</label>
+                                        <input type="date" id="dob" required onchange="calculateAge()">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="age">Age *</label>
+                                        <input type="number" id="age" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="gender">Gender *</label>
+                                        <select id="gender" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="address">Address *</label>
+                                    <textarea id="address" rows="3" required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="diagnosis">Diagnosis *</label>
+                                    <select id="diagnosis" required>
+                                        <option value="">Select Diagnosis</option>
+                                        <option value="chronic-kidney-disease">Chronic Kidney Disease</option>
+                                        <option value="diabetic-nephropathy">Diabetic Nephropathy</option>
+                                        <option value="hypertension">Hypertension</option>
+                                        <option value="glomerulonephritis">Glomerulonephritis</option>
+                                        <option value="polycystic-kidney">Polycystic Kidney Disease</option>
+                                        <option value="lupus-nephritis">Lupus Nephritis</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn-primary">Register Patient</button>
+                            </form>
+                            <div id="form-message" class="form-message"></div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div class="tab-content" id="reports-content">
+                        <div class="reports-header">
+                            <h3>Patient Records</h3>
+                            <div class="reports-filters">
+                                <input type="text" id="search-input" placeholder="Search by name or ID...">
+                                <select id="diagnosis-filter">
+                                    <option value="">All Diagnoses</option>
+                                    <option value="chronic-kidney-disease">Chronic Kidney Disease</option>
+                                    <option value="diabetic-nephropathy">Diabetic Nephropathy</option>
+                                    <option value="hypertension">Hypertension</option>
+                                    <option value="glomerulonephritis">Glomerulonephritis</option>
+                                    <option value="polycystic-kidney">Polycystic Kidney Disease</option>
+                                    <option value="lupus-nephritis">Lupus Nephritis</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="export-buttons">
+                                    <button class="btn-export" onclick="exportData('csv')">📥 CSV</button>
+                                    <button class="btn-export" onclick="exportData('excel')">📥 Excel</button>
+                                    <button class="btn-export" onclick="exportData('pdf')">📥 PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table id="patients-table" class="patients-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>DOB</th>
+                                        <th>Age</th>
+                                        <th>Gender</th>
+                                        <th>Address</th>
+                                        <th>Diagnosis</th>
+                                        <th>Date Registered</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-info">
+                            <p id="record-count">Total Records: 0</p>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-content" id="settings-content">
+                        <div class="settings-card">
+                            <h3>Hospital Settings</h3>
+                            <div class="setting-item">
+                                <label>Hospital Name</label>
+                                <input type="text" value="Central Hospital" readonly>
+                            </div>
+                            <div class="setting-item">
+                                <label>Hospital ID</label>
+                                <input type="text" value="HSP-001" readonly>
+                            </div>
+                            <div class="setting-item">
+                                <label>Email Address</label>
+                                <input type="email" value="hospital@demo.com">
+                            </div>
+                            <button class="btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Health Services Dashboard -->
+        <div id="health-service-dashboard" class="page">
+            <div class="dashboard-wrapper">
+                <!-- Sidebar Navigation -->
+                <aside class="sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo-small">HS</div>
+                        <h2>Health Services</h2>
+                    </div>
+                    <nav class="sidebar-nav">
+                        <a href="#" class="nav-item active" data-tab="province-overview">
+                            <span class="icon">🗺️</span>
+                            <span>Province View</span>
+                        </a>
+                        <a href="#" class="nav-item" data-tab="hospital-list">
+                            <span class="icon">🏥</span>
+                            <span>Hospitals</span>
+                        </a>
+                        <a href="#" class="nav-item" data-tab="analytics">
+                            <span class="icon">📈</span>
+                            <span>Analytics</span>
+                        </a>
+                        <a href="#" class="nav-item" data-tab="hs-settings">
+                            <span class="icon">⚙️</span>
+                            <span>Settings</span>
+                        </a>
+                    </nav>
+                    <div class="sidebar-footer">
+                        <div class="user-info">
+                            <div class="user-avatar">H</div>
+                            <div class="user-details">
+                                <p class="user-name">Health Services</p>
+                                <p class="user-role">Administrator</p>
+                            </div>
+                        </div>
+                        <button class="btn-logout" onclick="logout()">Logout</button>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="main-content">
+                    <header class="top-header">
+                        <h1 id="hs-page-title">Province Overview</h1>
+                        <div class="header-actions">
+                            <select id="time-range-filter" class="time-filter">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly" selected>Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="semester">Semester</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                    </header>
+
+                    <!-- Province Overview Tab -->
+                    <div class="tab-content active" id="province-overview-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Total Cases (Province)</p>
+                                    <p class="stat-value" id="prov-total-cases">12,450</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🏥</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Active Hospitals</p>
+                                    <p class="stat-value" id="active-hospitals">24</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Total Patients</p>
+                                    <p class="stat-value" id="prov-total-patients">3,450</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📈</div>
+                                <div class="stat-info">
+                                    <p class="stat-label">Avg Cases/Hospital</p>
+                                    <p class="stat-value" id="avg-cases-hospital">519</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h3>Province Cases Trend</h3>
+                                <canvas id="provinceTrendsChart" height="100"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>Hospital Participation</h3>
+                                <canvas id="hospitalParticipationChart" height="100"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card full-width">
+                            <h3>Hospital Comparison (Cases & Patients)</h3>
+                            <canvas id="hospitalComparisonChart" height="80"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Hospital List Tab -->
+                    <div class="tab-content" id="hospital-list-content">
+                        <div class="hospital-list-header">
+                            <h3>Registered Hospitals</h3>
+                            <input type="text" id="hospital-search" placeholder="Search hospitals...">
+                        </div>
+                        <div class="hospital-cards">
+                            <div class="hospital-card">
+                                <h4>Central Hospital</h4>
+                                <p><strong>ID:</strong> HSP-001</p>
+                                <p><strong>Cases:</strong> 1,245</p>
+                                <p><strong>Patients:</strong> 156</p>
+                                <p><strong>Status:</strong> <span class="status-active">Active</span></p>
+                            </div>
+                            <div class="hospital-card">
+                                <h4>Regional Medical Center</h4>
+                                <p><strong>ID:</strong> HSP-002</p>
+                                <p><strong>Cases:</strong> 987</p>
+                                <p><strong>Patients:</strong> 123</p>
+                                <p><strong>Status:</strong> <span class="status-active">Active</span></p>
+                            </div>
+                            <div class="hospital-card">
+                                <h4>St. Mary's Hospital</h4>
+                                <p><strong>ID:</strong> HSP-003</p>
+                                <p><strong>Cases:</strong> 856</p>
+                                <p><strong>Patients:</strong> 98</p>
+                                <p><strong>Status:</strong> <span class="status-active">Active</span></p>
+                            </div>
+                            <div class="hospital-card">
+                                <h4>City General Hospital</h4>
+                                <p><strong>ID:</strong> HSP-004</p>
+                                <p><strong>Cases:</strong> 1,102</p>
+                                <p><strong>Patients:</strong> 134</p>
+                                <p><strong>Status:</strong> <span class="status-active">Active</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Tab -->
+                    <div class="tab-content" id="analytics-content">
+                        <div class="analytics-container">
+                            <h3>Detailed Analytics</h3>
+                            <div class="analytics-report">
+                                <div class="analysis-section">
+                                    <h4>Case Distribution by Diagnosis</h4>
+                                    <table class="analytics-table">
+                                        <tr>
+                                            <td>Chronic Kidney Disease</td>
+                                            <td class="progress"><div class="progress-bar" style="width: 35%"></div></td>
+                                            <td>35%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Diabetic Nephropathy</td>
+                                            <td class="progress"><div class="progress-bar" style="width: 28%"></div></td>
+                                            <td>28%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Hypertension</td>
+                                            <td class="progress"><div class="progress-bar" style="width: 22%"></div></td>
+                                            <td>22%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Glomerulonephritis</td>
+                                            <td class="progress"><div class="progress-bar" style="width: 10%"></div></td>
+                                            <td>10%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Other</td>
+                                            <td class="progress"><div class="progress-bar" style="width: 5%"></div></td>
+                                            <td>5%</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-content" id="hs-settings-content">
+                        <div class="settings-card">
+                            <h3>Health Services Settings</h3>
+                            <div class="setting-item">
+                                <label>Organization Name</label>
+                                <input type="text" value="Provincial Health Services" readonly>
+                            </div>
+                            <div class="setting-item">
+                                <label>Organization ID</label>
+                                <input type="text" value="HS-PROV-01" readonly>
+                            </div>
+                            <div class="setting-item">
+                                <label>Contact Email</label>
+                                <input type="email" value="healthservice@demo.com">
+                            </div>
+                            <button class="btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
